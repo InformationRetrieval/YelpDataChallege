@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -131,7 +132,6 @@ public class readExcel {
 						finalDataWB = new HSSFWorkbook();
 						train = finalDataWB.createSheet("data"+docnumber);
 						rowCounter = 1;
-						
 					}
 				}
 				
@@ -150,6 +150,41 @@ public class readExcel {
 		}
 		
 	} 
+	
+	public static void getTopWords(){
+		HSSFWorkbook catTextBook = new HSSFWorkbook();
+		HSSFSheet sheet = catTextBook.getSheetAt(0);
+		HSSFRow row = null;
+		int rowCount = 1;
+		
+		while(true){
+			
+			row = sheet.getRow(rowCount++);
+			
+			if(row != null){
+				HashMap<String, Integer> wordCount = new HashMap<>();
+				String text = row.getCell(2).getStringCellValue();
+				Set<String> uniqueWords = uniqueWordExtraction(text);
+				
+				for(String word : uniqueWords){
+					wordCount.put(word, 0);
+				}
+				
+				StringTokenizer st = new StringTokenizer(text); 
+				while(st.hasMoreTokens()) {
+					String currentWord = st.nextToken();
+					if(wordCount.containsKey(currentWord)){
+						wordCount.put(currentWord, wordCount.get(currentWord)+1);
+					}
+					else{
+						wordCount.put(currentWord, 1);
+					}
+				} 
+				
+			}
+		}
+		
+	}
 
 	public static void main(String args[]) throws Exception{
 //		uniqueWordExtraction("my!!name is mayur.mayur's friend is aniket!");
