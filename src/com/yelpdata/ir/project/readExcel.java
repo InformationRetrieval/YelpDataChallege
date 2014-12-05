@@ -39,6 +39,9 @@ import org.json.simple.parser.JSONParser;
 
 public class readExcel {
 	
+	//Global map containing category and coresponding reviews
+	public static HashMap<String,ArrayList<String>> globalCat = new HashMap<String,ArrayList<String>>();
+	
 	public static HashMap<String , Double> kewWords = new HashMap<>();
 	
 	
@@ -210,6 +213,8 @@ public class readExcel {
 		
 		HashMap<String,String> mapCatTextFinal = new HashMap<String,String>();
 		
+		
+		
 		while(true){	
 			
 			row = sheet.getRow(counter);
@@ -217,6 +222,21 @@ public class readExcel {
 			if(row != null){
 				String categories = row.getCell(1).getStringCellValue();
 				String text = row.getCell(2).getStringCellValue();
+				
+				
+				
+				
+				//Store the cat and coreesoping reviews groups
+				if(globalCat.containsKey(categories)){
+					ArrayList<String> Listreview = globalCat.get(categories);
+					Listreview.add(text);
+					globalCat.put(categories,Listreview);
+				}
+				else{
+					ArrayList<String> tempList = new ArrayList<>();
+					tempList.add(text);
+					globalCat.put(categories, tempList);
+				}
 				
 				if(mapCatText.containsKey(categories))
 					mapCatText.put(categories,mapCatText.get(categories)+text);
@@ -239,15 +259,15 @@ public class readExcel {
 	        it.remove(); // avoids a ConcurrentModificationException
 	    } */
 	    
-	    
+	  
 	  writeHashMAptoExcel(getTopWords(mapCatText));
 	}
 	
 	
-	public static String getTop(HashMap<String,Integer> map){
+	public static String getTop(HashMap<String,Double> map){
 		
 		  ValueComparator bvc =  new ValueComparator(map);
-	      TreeMap<String,Integer> sorted_map = new TreeMap<String,Integer>(bvc);
+	      TreeMap<String,Double> sorted_map = new TreeMap<String,Double>(bvc);
 	      String topWords = "";
 	      
 	      sorted_map.putAll(map);
@@ -272,7 +292,7 @@ public class readExcel {
 	      return topWords;
 	}
 	
-	public static HashMap<String, String> getTopWords(HashMap<String,String> map){
+	public static HashMap<String, String> getTopWords(HashMap<String,String> map) throws IOException{
 		/*HSSFWorkbook catTextBook = new HSSFWorkbook();
 		HSSFSheet sheet = catTextBook.getSheetAt(0);
 		HSSFRow row = null;
@@ -311,28 +331,55 @@ public class readExcel {
 		HashMap<String, String> topCatWords = new HashMap<String,String>();
 	    while (it.hasNext()) {
 	    	HashMap<String, Integer> wordCount = new HashMap<>();
+	    	HashMap<String,Double> tfIDF = new HashMap<>(); 
 	    	Map.Entry pairs = (Map.Entry)it.next();
 	        String tempText = pairs.getValue().toString();
 	        StringTokenizer st = new StringTokenizer(tempText);
 	        while(st.hasMoreElements()){
 	        	String currentWord = st.nextToken();
-				if(wordCount.containsKey(currentWord)){
+	        	if(wordCount.containsKey(currentWord)){
 					wordCount.put(currentWord, wordCount.get(currentWord)+1);
 				}
 				else{
 					wordCount.put(currentWord, 1);
-				} 
-			
+				}
+				
 	        }
+	        Iterator itr = wordCount.entrySet().iterator();
+	        while (itr.hasNext()) {
+	        	Map.Entry KV = (Map.Entry)itr.next();
+	        	
+	        	double IDF = calculateIDF(pairs.getKey().toString(),KV.getKey().toString());
+	        	
+	        	tfIDF.put(KV.getKey().toString(),Integer.parseInt(KV.getValue().toString()) / IDF );
+	        	
+	        }
+	        
+	       
 		    
 	        System.out.println(pairs.getKey().toString());
 	        System.out.println(wordCount.toString());
-	        topCatWords.put(pairs.getKey().toString(), getTop(wordCount));
+	        topCatWords.put(pairs.getKey().toString(), getTop(tfIDF));
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 		
 		return topCatWords; 
 	}
+	
+	
+	
+	public static double calculateIDF(String catName, String word){
+		ArrayList<String> reviewsForCat = new ArrayList<String>();
+		reviewsForCat = globalCat.get(catName);
+		int count =0;
+		for(String review : reviewsForCat){
+			if(review.contains(word)){
+				count++;
+			}
+		}
+		return count/reviewsForCat.size();
+	}
+	
 
 	public static void main(String args[]) throws Exception{
 		uniqueWordExtraction("my!!name is mayur.mayur's friend is aniket!");
@@ -465,8 +512,8 @@ public class readExcel {
 
 class ValueComparator implements Comparator<String> {
 
-    Map<String, Integer> base;
-    public ValueComparator(Map<String, Integer> base) {
+    Map<String, Double> base;
+    public ValueComparator(Map<String, Double> base) {
         this.base = base;
     }
 
