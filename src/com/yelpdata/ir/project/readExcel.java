@@ -238,6 +238,7 @@ public class readExcel {
 					globalCat.put(categories, tempList);
 				}
 				
+				
 				if(mapCatText.containsKey(categories))
 					mapCatText.put(categories,mapCatText.get(categories)+text);
 				else
@@ -246,10 +247,10 @@ public class readExcel {
 			
 			else
 				break;
-			
 			counter++;
 				
 		}
+		//System.out.println(globalCat.toString());
 	/*	Iterator it = mapCatText.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
@@ -351,14 +352,14 @@ public class readExcel {
 	        	
 	        	double IDF = calculateIDF(pairs.getKey().toString(),KV.getKey().toString());
 	        	
-	        	tfIDF.put(KV.getKey().toString(),Integer.parseInt(KV.getValue().toString()) / IDF );
+	        	tfIDF.put(KV.getKey().toString(),Integer.parseInt(KV.getValue().toString()) * IDF );
 	        	
 	        }
 	        
 	       
 		    
-	        System.out.println(pairs.getKey().toString());
-	        System.out.println(wordCount.toString());
+	        //System.out.println(pairs.getKey().toString());
+	        //System.out.println(wordCount.toString());
 	        topCatWords.put(pairs.getKey().toString(), getTop(tfIDF));
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
@@ -377,7 +378,7 @@ public class readExcel {
 				count++;
 			}
 		}
-		return count/reviewsForCat.size();
+		return (double)count/reviewsForCat.size();
 	}
 	
 
