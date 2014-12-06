@@ -44,6 +44,8 @@ public class readExcel {
 	
 	public static HashMap<String , Double> kewWords = new HashMap<>();
 	
+	public static HashMap<String,String> mapCatText = new HashMap<String,String>();
+	
 	
 	public static void readBusinessCategory(HashMap<String, String> mapBidText){
 		
@@ -209,7 +211,7 @@ public class readExcel {
 		
 		HSSFWorkbook clubCatData = new HSSFWorkbook();
 		
-		HashMap<String,String> mapCatText = new HashMap<String,String>();
+		
 		
 		HashMap<String,String> mapCatTextFinal = new HashMap<String,String>();
 		
@@ -351,6 +353,7 @@ public class readExcel {
 	        	Map.Entry KV = (Map.Entry)itr.next();
 	        	
 	        	double IDF = calculateIDF(pairs.getKey().toString(),KV.getKey().toString());
+	        	double GIDF = calGlobalTF(pairs.getKey().toString(),KV.getKey().toString()); 
 	        	
 	        	tfIDF.put(KV.getKey().toString(),Integer.parseInt(KV.getValue().toString()) * IDF );
 	        	
@@ -381,53 +384,66 @@ public class readExcel {
 		return (double)count/reviewsForCat.size();
 	}
 	
+	public static double calGlobalTF(String cat, String word){
+		Iterator itr = mapCatText.entrySet().iterator();
+		int gCount = 0;
+        while (itr.hasNext()) {
+        	Map.Entry KV = (Map.Entry)itr.next();
+        	
+        	if(KV.getValue().toString().contains(word)){
+        		gCount++;
+        	}
+        }
+        return (double)mapCatText.size()/gCount;
 
+	}
+	
 	public static void main(String args[]) throws Exception{
-		uniqueWordExtraction("my!!name is mayur.mayur's friend is aniket!");
-		uniqueCategoriesExtraction("[\"Bakeries\",\"Food\",\"Breakfast & Brunch\",\"Coffee & Tea\",\"Restaurants\"]");
-		String path = "filteredRecords.xls";
-		FileInputStream file = new FileInputStream(new File(path));
-		
-		HSSFWorkbook workbook = new HSSFWorkbook(file);
-		
-		HSSFSheet sheet = workbook.getSheetAt(0);
-		HSSFRow row = null;
-		int counter = 1;
-		HashMap<String,String> mapBidTextFinal = new HashMap<String,String>();
-		while(true){
-			row = sheet.getRow(counter);
-			HashMap<String,String> mapBidText = new HashMap<String,String>();
-			if(row != null){
-				String bId = row.getCell(1).getStringCellValue();
-				String text = row.getCell(0).getStringCellValue().toLowerCase();
-				if(mapBidText.containsKey(bId))
-					mapBidText.put(bId,mapBidText.get(bId)+text);
-				else
-					mapBidText.put(bId,text) ;
-			}
-			
-			else 
-				break;
-			
-			
-			Iterator it = mapBidText.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pairs = (Map.Entry)it.next();
-		        String tempText = pairs.getValue().toString();
-		        mapBidTextFinal.put(pairs.getKey().toString(), removeStopWords(tempText));
-		      //  System.out.println(pairs.getKey());
-		        it.remove(); // avoids a ConcurrentModificationException
-		    } 
-		
-			//String result = "This is the test for removing the stop word from the given text. I hope this method is of use.";
-			//Set<String> uniqueValues = uniqueWordExtraction(result);
-			
-			//System.out.println("terms = "+finalText);
-			counter++;
-		}
-		
-		readBusinessCategory(mapBidTextFinal);
-		generateData();
+//		uniqueWordExtraction("my!!name is mayur.mayur's friend is aniket!");
+//		uniqueCategoriesExtraction("[\"Bakeries\",\"Food\",\"Breakfast & Brunch\",\"Coffee & Tea\",\"Restaurants\"]");
+//		String path = "filteredRecords.xls";
+//		FileInputStream file = new FileInputStream(new File(path));
+//		
+//		HSSFWorkbook workbook = new HSSFWorkbook(file);
+//		
+//		HSSFSheet sheet = workbook.getSheetAt(0);
+//		HSSFRow row = null;
+//		int counter = 1;
+//		HashMap<String,String> mapBidTextFinal = new HashMap<String,String>();
+//		while(true){
+//			row = sheet.getRow(counter);
+//			HashMap<String,String> mapBidText = new HashMap<String,String>();
+//			if(row != null){
+//				String bId = row.getCell(1).getStringCellValue();
+//				String text = row.getCell(0).getStringCellValue().toLowerCase();
+//				if(mapBidText.containsKey(bId))
+//					mapBidText.put(bId,mapBidText.get(bId)+text);
+//				else
+//					mapBidText.put(bId,text) ;
+//			}
+//			
+//			else 
+//				break;
+//			
+//			
+//			Iterator it = mapBidText.entrySet().iterator();
+//		    while (it.hasNext()) {
+//		        Map.Entry pairs = (Map.Entry)it.next();
+//		        String tempText = pairs.getValue().toString();
+//		        mapBidTextFinal.put(pairs.getKey().toString(), removeStopWords(tempText));
+//		      //  System.out.println(pairs.getKey());
+//		        it.remove(); // avoids a ConcurrentModificationException
+//		    } 
+//		
+//			//String result = "This is the test for removing the stop word from the given text. I hope this method is of use.";
+//			//Set<String> uniqueValues = uniqueWordExtraction(result);
+//			
+//			//System.out.println("terms = "+finalText);
+//			counter++;
+//		}
+//		
+//		readBusinessCategory(mapBidTextFinal);
+//		generateData();
 		clubCategoryData();
 	}
 	
