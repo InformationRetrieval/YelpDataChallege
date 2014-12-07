@@ -23,7 +23,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class buildFeature {
+public class BuildFeature {
 	
 	public static String getWords(String text) {
 	    //List<String> words = new ArrayList<String>();
@@ -81,8 +81,8 @@ public class buildFeature {
 				if(counter > 10000)
 					break;
 				
-				if(readExcel.BidCatMap.get(bId) != null){
-					if(readExcel.BidCatMap.get(bId).size() > 0){
+				if(IndiCatData.BidCatMap.get(bId) != null){
+					if(IndiCatData.BidCatMap.get(bId).size() > 0){
 				
 						writer.write(System.getProperty( "line.separator" ));
 						StringTokenizer st = new StringTokenizer(finalText);
@@ -100,7 +100,7 @@ public class buildFeature {
 							}
 						}
 				
-				ArrayList<String> categories = readExcel.BidCatMap.get(bId);
+				ArrayList<String> categories = IndiCatData.BidCatMap.get(bId);
 				writer.append(categories.toString());
 			}
 				}	
@@ -213,7 +213,7 @@ public static void build() throws IOException {
 		writer.append("Result");
 		
 		//Write the data from the reviews to the dataset
-		writeDataSet(dataValues,writer);
+		//writeDataSet(dataValues,writer);
 		
 		
 		writer.flush();
