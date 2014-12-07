@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -41,10 +42,12 @@ public class readExcel {
 	
 	//Global map containing category and coresponding reviews
 	public static HashMap<String,ArrayList<String>> globalCat = new HashMap<String,ArrayList<String>>();
-	
+	public static HashMap<String,ArrayList<String>> BidCatMap = new HashMap<String,ArrayList<String>>();
 	public static HashMap<String , Double> kewWords = new HashMap<>();
-	
 	public static HashMap<String,String> mapCatText = new HashMap<String,String>();
+	
+	//public static Hashtable<MyStringCmp,String> delCat = new Hashtable<MyStringCmp,String>();
+	public static ArrayList<String> delCat = new ArrayList<>();
 	
 	
 	public static void readBusinessCategory(HashMap<String, String> mapBidText){
@@ -119,13 +122,27 @@ public class readExcel {
 				String bId = row.getCell(0).getStringCellValue();
 				String categories = row.getCell(1).getStringCellValue();
 				String text = row.getCell(2).getStringCellValue();
+				if(!BidCatMap.containsKey(bId)){
+					ArrayList<String> tempCatList = new ArrayList<>();
+					BidCatMap.put(bId, tempCatList);
+				}
+				
+				
+				
 				
 				//System.out.println("Bid : "+bId);
 				//System.out.println("categories : "+categories);
 				//System.out.println("text : "+text);
 				
-				Set<String> cats = uniqueCategoriesExtraction(categories.replaceAll("[\\[\\]]", ""));
-				for(String cat : cats){				
+				Set<String> cats = uniqueCategoriesExtraction(categories.replaceAll("[\\[\\]]", "").replaceAll("\"", ""));
+			
+				
+				for(String cat : cats){
+					ArrayList<String> tempList = BidCatMap.get(bId);
+					if(checkDelCat(cat)){
+						tempList.add(cat);
+						BidCatMap.put(bId, tempList);
+					}
 					
 					HSSFRow catRow = train.createRow(rowCounter++);
 					Cell bidCell = catRow.createCell(0);
@@ -163,7 +180,7 @@ public class readExcel {
 	} 
 	
 	
-	public static void writeHashMAptoExcel(HashMap<String,String> h) throws IOException{
+	public static void writeHashMAptoExcel(HashMap<String,String> h,String fileName) throws IOException{
 		
 		
 		HSSFWorkbook CatClub = new HSSFWorkbook();
@@ -192,7 +209,7 @@ public class readExcel {
 	        it.remove(); // avoids a ConcurrentModificationException
 	    } 
 	    
-	    FileOutputStream out = new FileOutputStream(new File("categoryClubData.xls"));
+	    FileOutputStream out = new FileOutputStream(new File(fileName));
 	    CatClub.write(out);
 		out.close();
 		
@@ -216,7 +233,7 @@ public class readExcel {
 		HashMap<String,String> mapCatTextFinal = new HashMap<String,String>();
 		
 		
-		
+		int c = 0;
 		while(true){	
 			
 			row = sheet.getRow(counter);
@@ -225,7 +242,7 @@ public class readExcel {
 				String categories = row.getCell(1).getStringCellValue();
 				String text = row.getCell(2).getStringCellValue();
 				
-				
+				//System.out.println("Cat : "+categories+" "+c++);
 				
 				
 				//Store the cat and coreesoping reviews groups
@@ -263,7 +280,7 @@ public class readExcel {
 	    } */
 	    
 	  
-	  writeHashMAptoExcel(getTopWords(mapCatText));
+	  writeHashMAptoExcel(getTopWords(mapCatText),"categoryClubData.xls");
 	}
 	
 	
@@ -284,7 +301,7 @@ public class readExcel {
 	      int count = 1;
 		    while (it.hasNext()) {
 		    	Map.Entry keyVal = (Map.Entry)it.next();
-		    	if(count < 51){
+		    	if(count < 41){
 		    		//System.out.println(keyVal.getKey().toString()+"   "+keyVal.getValue().toString());
 		    		topWords = topWords + " " + keyVal.getKey().toString();
 		    	}
@@ -292,7 +309,7 @@ public class readExcel {
 		    		break;
 		    	count++;
 		    }
-	      return topWords;
+		  return topWords;
 	}
 	
 	public static HashMap<String, String> getTopWords(HashMap<String,String> map) throws IOException{
@@ -355,7 +372,7 @@ public class readExcel {
 	        	double IDF = calculateIDF(pairs.getKey().toString(),KV.getKey().toString());
 	        	double GIDF = calGlobalTF(pairs.getKey().toString(),KV.getKey().toString()); 
 	        	
-	        	tfIDF.put(KV.getKey().toString(),Integer.parseInt(KV.getValue().toString()) * IDF );
+	        	tfIDF.put(KV.getKey().toString(),Integer.parseInt(KV.getValue().toString()) * IDF *GIDF );
 	        	
 	        }
 	        
@@ -399,52 +416,61 @@ public class readExcel {
 	}
 	
 	public static void main(String args[]) throws Exception{
-//		uniqueWordExtraction("my!!name is mayur.mayur's friend is aniket!");
-//		uniqueCategoriesExtraction("[\"Bakeries\",\"Food\",\"Breakfast & Brunch\",\"Coffee & Tea\",\"Restaurants\"]");
-//		String path = "filteredRecords.xls";
-//		FileInputStream file = new FileInputStream(new File(path));
-//		
-//		HSSFWorkbook workbook = new HSSFWorkbook(file);
-//		
-//		HSSFSheet sheet = workbook.getSheetAt(0);
-//		HSSFRow row = null;
-//		int counter = 1;
-//		HashMap<String,String> mapBidTextFinal = new HashMap<String,String>();
-//		while(true){
-//			row = sheet.getRow(counter);
-//			HashMap<String,String> mapBidText = new HashMap<String,String>();
-//			if(row != null){
-//				String bId = row.getCell(1).getStringCellValue();
-//				String text = row.getCell(0).getStringCellValue().toLowerCase();
-//				if(mapBidText.containsKey(bId))
-//					mapBidText.put(bId,mapBidText.get(bId)+text);
-//				else
-//					mapBidText.put(bId,text) ;
-//			}
-//			
-//			else 
-//				break;
-//			
-//			
-//			Iterator it = mapBidText.entrySet().iterator();
-//		    while (it.hasNext()) {
-//		        Map.Entry pairs = (Map.Entry)it.next();
-//		        String tempText = pairs.getValue().toString();
-//		        mapBidTextFinal.put(pairs.getKey().toString(), removeStopWords(tempText));
-//		      //  System.out.println(pairs.getKey());
-//		        it.remove(); // avoids a ConcurrentModificationException
-//		    } 
-//		
-//			//String result = "This is the test for removing the stop word from the given text. I hope this method is of use.";
-//			//Set<String> uniqueValues = uniqueWordExtraction(result);
-//			
-//			//System.out.println("terms = "+finalText);
-//			counter++;
-//		}
-//		
-//		readBusinessCategory(mapBidTextFinal);
-//		generateData();
+		
+		BufferedReader br = new BufferedReader(new FileReader("deletedCat"));
+		String line = null;
+		line = br.readLine();
+		while(line != null){
+			   delCat.add(line);
+			   line = br.readLine();
+			}
+		//System.out.println(delCat.toString());
+		
+		/*String path = "filteredRecords.xls";
+		FileInputStream file = new FileInputStream(new File(path));
+		
+		HSSFWorkbook workbook = new HSSFWorkbook(file);
+		
+		HSSFSheet sheet = workbook.getSheetAt(0);
+		HSSFRow row = null;
+		int counter = 1;
+		HashMap<String,String> mapBidTextFinal = new HashMap<String,String>();
+		while(true){
+			row = sheet.getRow(counter);
+			HashMap<String,String> mapBidText = new HashMap<String,String>();
+			if(row != null){
+				String bId = row.getCell(1).getStringCellValue();
+				String text = row.getCell(0).getStringCellValue().toLowerCase();
+				if(mapBidText.containsKey(bId))
+					mapBidText.put(bId,mapBidText.get(bId)+text);
+				else
+					mapBidText.put(bId,text) ;
+			}
+			
+			else 
+				break;
+			
+			
+			Iterator it = mapBidText.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        String tempText = pairs.getValue().toString();
+		        mapBidTextFinal.put(pairs.getKey().toString(), removeStopWords(tempText));
+		      //  System.out.println(pairs.getKey());
+		        it.remove(); // avoids a ConcurrentModificationException
+		    } 
+		
+			//String result = "This is the test for removing the stop word from the given text. I hope this method is of use.";
+			//Set<String> uniqueValues = uniqueWordExtraction(result);
+			
+			//System.out.println("terms = "+finalText);
+			counter++;
+		}*/
+		
+		//readBusinessCategory(mapBidTextFinal);
+		generateData();
 		clubCategoryData();
+		buildFeature.build();
 	}
 	
 	public static String removeStopWords(String textFile) throws Exception {
@@ -482,7 +508,7 @@ public class readExcel {
 	
 	
 	public static String uniqueWordExtraction(String textValue){
-		Set<String> uniqueValues = new HashSet<String>(Arrays.asList(textValue.toLowerCase().split("[-.,:;?!~\\s]+")));
+		Set<String> uniqueValues = new HashSet<String>(Arrays.asList(textValue.toLowerCase().split("[.,:;?!~\\s]+")));
 		String finalText= "";
 		for (String term : uniqueValues){
 			//System.out.println("terms = "+term);
@@ -500,6 +526,19 @@ public class readExcel {
 			//System.out.println("terms = "+term);
 		}
 		return unique;
+	}
+	
+	
+	public static boolean checkDelCat(String cate){
+		
+		
+		for (String categories : delCat){
+				
+			if(categories.equalsIgnoreCase(cate))
+				return false;
+			
+		}
+		return true;
 	}
 	
 
