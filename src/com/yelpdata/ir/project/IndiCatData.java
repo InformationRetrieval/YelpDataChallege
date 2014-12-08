@@ -96,6 +96,7 @@ public class IndiCatData {
 			
 			counter++;
 		}
+		CreateExcel.writeListHashToExcel(BidCatMap,"BidCatMap.xls");
 		
 	} 
 }
