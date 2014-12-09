@@ -79,7 +79,7 @@ public class ClubCatData {
 	    
 	  
 	  CreateExcel.writeHashMAptoExcel(TopWords.getWordScores(mapCatText),"categoryClubData.xls");
-	  CreateExcel.writeListHashToExcel(globalCat,"globalCat.xls");
+	  //CreateExcel.writeListHashToExcel(globalCat,"globalCat.xls");
 	}
 	
 	

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import com.yelpdata.ir.utils.Utilities;
 
 public class BuildFeature {
 	
@@ -62,6 +65,31 @@ public class BuildFeature {
 	public static void writeDataSet(String finalText,FileWriter writer) throws IOException{
 		
 		//Read each review from the file
+		String pathBidCat = "BidCatMap.xls";
+		FileInputStream fileBidCat = new FileInputStream(new File(pathBidCat));
+		
+		HashMap<String,String> BidCatfrmFile = new HashMap<>();
+		
+		HSSFWorkbook workbookBidCat = new HSSFWorkbook(fileBidCat);
+		HSSFSheet sheetBiCat = workbookBidCat.getSheetAt(0);
+		HSSFRow rowBidCat = null;
+		int iterator = 1;
+		String CAT = null;
+		while(true){
+			rowBidCat = sheetBiCat.getRow(iterator);
+				if(rowBidCat !=null){
+					String BID = rowBidCat.getCell(1).getStringCellValue();
+					CAT = rowBidCat.getCell(2).getStringCellValue();
+					
+					BidCatfrmFile.put(BID, CAT);
+				}
+				else
+					break;
+				iterator++;
+		}
+		
+		
+		//Read each review from the file
 		String path = "filteredRecords.xls";
 		FileInputStream file = new FileInputStream(new File(path));
 		
@@ -78,12 +106,17 @@ public class BuildFeature {
 				String bId = row.getCell(1).getStringCellValue();
 				String reviewText = row.getCell(0).getStringCellValue().toLowerCase();
 				
-				if(counter > 10000)
+				/*if(counter > 10)
 					break;
-				
-				if(IndiCatData.BidCatMap.get(bId) != null){
-					if(IndiCatData.BidCatMap.get(bId).size() > 0){
-				
+				*/
+				if(BidCatfrmFile.get(bId) != null){
+					
+					Set<String> cats = Utilities.uniqueCategoriesExtraction(BidCatfrmFile.get(bId).replaceAll("[\\[\\]]", "").replaceAll("\"", ""));
+					
+					for(String cat: cats){
+						if(Utilities.checkDelCat(cat))
+							continue;
+						
 						writer.write(System.getProperty( "line.separator" ));
 						StringTokenizer st = new StringTokenizer(finalText);
 						while(st.hasMoreElements()){
@@ -99,11 +132,10 @@ public class BuildFeature {
 								}
 							}
 						}
-				
-				ArrayList<String> categories = IndiCatData.BidCatMap.get(bId);
-				writer.append(categories.toString());
-			}
-				}	
+						
+						writer.append(cat);
+					}
+				}
 			}
 			else
 				break;
@@ -213,7 +245,7 @@ public static void build() throws IOException {
 		writer.append("Result");
 		
 		//Write the data from the reviews to the dataset
-		//writeDataSet(dataValues,writer);
+		writeDataSet(dataValues,writer);
 		
 		
 		writer.flush();

@@ -106,7 +106,7 @@ public static void main(String args[]) throws Exception{
 		
 //		readBusinessCategory(mapBidTextFinal);
 //		IndiCatData.generateData();
-		ClubCatData.clubCategoryData();
+//		ClubCatData.clubCategoryData();
 		BuildFeature.build();
 	}
 }
