@@ -45,22 +45,28 @@ public class readExcel {
 	//Global map containing category and coresponding reviews
 	
 	
-	public static HashMap<String , Double> kewWords = new HashMap<>();
-	
-	
-	//public static Hashtable<MyStringCmp,String> delCat = new Hashtable<MyStringCmp,String>();
-	public static ArrayList<String> delCat = new ArrayList<>();
+	public static HashMap<String , Double> kewWords = new HashMap<String , Double>();
+	public static ArrayList<String> delCat = new ArrayList<String>();
+	public static ArrayList<String> lowPrecisionCategories = new ArrayList<String>();
 	
 	
 public static void main(String args[]) throws Exception{
+		BufferedReader br = new BufferedReader(new FileReader("deletedCat"));
+		String line = null;
+		line = br.readLine();
+		while(line != null){
+			   delCat.add(line);
+			   line = br.readLine();
+		}
 		
-//		BufferedReader br = new BufferedReader(new FileReader("deletedCat"));
-//		String line = null;
-//		line = br.readLine();
-//		while(line != null){
-//			   delCat.add(line);
-//			   line = br.readLine();
-//			}
+		br = new BufferedReader(new FileReader("lowPrecisionCategories"));
+		line = null;
+		line = br.readLine();
+		while(line != null){
+			lowPrecisionCategories.add(line);
+			   line = br.readLine();
+		}
+
 //		//System.out.println(delCat.toString());
 //		
 //		String path = "filteredRecords.xls";
@@ -106,8 +112,10 @@ public static void main(String args[]) throws Exception{
 		
 //		readBusinessCategory(mapBidTextFinal);
 //		IndiCatData.generateData();
-//		ClubCatData.clubCategoryData();
+		ClubCatData.clubCategoryData();
+//		System.out.println("Club Category Completed!!");
 		BuildFeature.build();
+//		System.out.println(Utilities.checkDelCat("restaurants"));
 	}
 }
 	

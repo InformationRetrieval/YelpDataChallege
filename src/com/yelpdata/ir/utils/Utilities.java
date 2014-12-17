@@ -86,12 +86,24 @@ public class Utilities {
 		
 		for (String categories : readExcel.delCat){
 				
-			if(categories.equalsIgnoreCase(cate))
-				return false;
+			if(categories.equalsIgnoreCase(cate.trim()))
+				return true;
 			
 		}
-		return true;
+		return false;
 	}
+	
+	public static boolean catInowPrecision(String catg){
+		
+		for (String categories : readExcel.lowPrecisionCategories){
+			
+			if(categories.equalsIgnoreCase(catg.trim()))
+				return true;
+			
+		}
+		return false;
+	}
+	
 }
 	
 

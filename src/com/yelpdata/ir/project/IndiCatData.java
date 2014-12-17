@@ -42,13 +42,12 @@ public class IndiCatData {
 				String bId = row.getCell(0).getStringCellValue();
 				String categories = row.getCell(1).getStringCellValue();
 				String text = row.getCell(2).getStringCellValue();
-				if(!BidCatMap.containsKey(bId)){
-					ArrayList<String> tempCatList = new ArrayList<>();
-					BidCatMap.put(bId, tempCatList);
-				}
 				
 				
-				
+//				if(!BidCatMap.containsKey(bId)){
+//					ArrayList<String> tempCatList = new ArrayList<String>();
+//					BidCatMap.put(bId, tempCatList);
+//				}
 				
 				//System.out.println("Bid : "+bId);
 				//System.out.println("categories : "+categories);
@@ -58,10 +57,18 @@ public class IndiCatData {
 			
 				
 				for(String cat : cats){
-					ArrayList<String> tempList = BidCatMap.get(bId);
 					if(Utilities.checkDelCat(cat)){
-						tempList.add(cat);
-						BidCatMap.put(bId, tempList);
+						if(!BidCatMap.containsKey(bId)){
+							ArrayList<String> tempCatList = new ArrayList<String>();
+							tempCatList.add(cat);
+							BidCatMap.put(bId, tempCatList);
+						}
+						else{
+							ArrayList<String> tempList = BidCatMap.get(bId);
+							//System.out.println("Cat ignored : "+cat);
+							tempList.add(cat);
+							BidCatMap.put(bId, tempList);
+						}
 					}
 					
 					HSSFRow catRow = train.createRow(rowCounter++);

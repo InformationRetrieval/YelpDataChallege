@@ -17,7 +17,9 @@ import com.yelpdata.ir.utils.Utilities;
 
 public class TopWords {
 	//Get Top 40 words from HashMap Values
-	public static String getTop(HashMap<String,Double> map){
+	public static String getTop(HashMap<String,Double> map, String catg){
+			
+		  //System.out.println("In get Top with "+catg);
 		
 		  ValueComparator bvc =  new ValueComparator(map);
 	      TreeMap<String,Double> sorted_map = new TreeMap<String,Double>(bvc);
@@ -34,25 +36,39 @@ public class TopWords {
 	      int count = 1;
 		    while (it.hasNext()) {
 		    	Map.Entry keyVal = (Map.Entry)it.next();
-		    	if(count < 41){
-		    		//System.out.println(keyVal.getKey().toString()+"   "+keyVal.getValue().toString());
-		    		topWords = topWords + " " + keyVal.getKey().toString();
+		    	if(Utilities.catInowPrecision(catg)){
+		    		if(count < 51){
+			    		//System.out.println(keyVal.getKey().toString()+"   "+keyVal.getValue().toString());
+			    		topWords = topWords + " " + keyVal.getKey().toString();
+			    	}
+		    		else
+			    		break;
 		    	}
-		    	else
-		    		break;
+		    	else{
+		    		if(count < 11){
+			    		//System.out.println(keyVal.getKey().toString()+"   "+keyVal.getValue().toString());
+			    		topWords = topWords + " " + keyVal.getKey().toString();
+			    	}
+		    		else
+			    		break;
+		    	}
 		    	count++;
 		    }
+		  //System.out.println("Top words found!");
 		  return topWords;
+		  
 	}
 	
 	
 	public static HashMap<String, String> getWordScores(HashMap<String,String> map) throws IOException{
 		
+		System.out.println("In get Word Scores");
+		
 		Iterator it = map.entrySet().iterator();
 		HashMap<String, String> topCatWords = new HashMap<String,String>();
 	    while (it.hasNext()) {
-	    	HashMap<String, Integer> wordCount = new HashMap<>();
-	    	HashMap<String,Double> tfIDF = new HashMap<>(); 
+	    	HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+	    	HashMap<String,Double> tfIDF = new HashMap<String,Double>(); 
 	    	Map.Entry pairs = (Map.Entry)it.next();
 	        String tempText = pairs.getValue().toString();
 	        StringTokenizer st = new StringTokenizer(tempText);
@@ -81,10 +97,12 @@ public class TopWords {
 		    
 	        //System.out.println(pairs.getKey().toString());
 	        //System.out.println(wordCount.toString());
-	        topCatWords.put(pairs.getKey().toString(), getTop(tfIDF));
+	        topCatWords.put(pairs.getKey().toString(), getTop(tfIDF, pairs.getKey().toString()));
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 		
+	    //System.out.println("Get word scores completed");
+	    
 		return topCatWords; 
 	}
 	

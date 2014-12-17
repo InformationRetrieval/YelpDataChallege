@@ -35,7 +35,9 @@ ehthumbs.db
 Thumbs.db
 /bin
 
-
+*.*~
 *.csv
 *.xlsx
 *.xls
+*.json
+*.*~

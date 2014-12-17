@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,11 +65,15 @@ public class BuildFeature {
 	
 	public static void writeDataSet(String finalText,FileWriter writer) throws IOException{
 		
+		PrintWriter catWriter = new PrintWriter("categories.txt", "UTF-8");
+		ArrayList<String> categori = new ArrayList<String>();
+		
+		
 		//Read each review from the file
 		String pathBidCat = "BidCatMap.xls";
 		FileInputStream fileBidCat = new FileInputStream(new File(pathBidCat));
 		
-		HashMap<String,String> BidCatfrmFile = new HashMap<>();
+		HashMap<String,String> BidCatfrmFile = new HashMap<String,String>();
 		
 		HSSFWorkbook workbookBidCat = new HSSFWorkbook(fileBidCat);
 		HSSFSheet sheetBiCat = workbookBidCat.getSheetAt(0);
@@ -89,9 +94,12 @@ public class BuildFeature {
 		}
 		
 		
+		
+		
 		//Read each review from the file
 		String path = "filteredRecords.xls";
 		FileInputStream file = new FileInputStream(new File(path));
+		
 		
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet sheet = workbook.getSheetAt(0);
@@ -106,16 +114,17 @@ public class BuildFeature {
 				String bId = row.getCell(1).getStringCellValue();
 				String reviewText = row.getCell(0).getStringCellValue().toLowerCase();
 				
-				/*if(counter > 10)
+				if(counter > 2001)
 					break;
-				*/
+				
 				if(BidCatfrmFile.get(bId) != null){
 					
 					Set<String> cats = Utilities.uniqueCategoriesExtraction(BidCatfrmFile.get(bId).replaceAll("[\\[\\]]", "").replaceAll("\"", ""));
 					
 					for(String cat: cats){
-						if(Utilities.checkDelCat(cat))
+						if(!Utilities.checkDelCat(cat))
 							continue;
+					
 						
 						writer.write(System.getProperty( "line.separator" ));
 						StringTokenizer st = new StringTokenizer(finalText);
@@ -132,8 +141,9 @@ public class BuildFeature {
 								}
 							}
 						}
-						
-						writer.append(cat);
+//						catWriter.println(cat);
+						cat = cat.trim();
+						writer.append(cat.trim());
 					}
 				}
 			}
@@ -141,7 +151,7 @@ public class BuildFeature {
 				break;
 			counter++;
 		}
-		
+		catWriter.close();
 		
 	}
 	
@@ -210,8 +220,8 @@ public static void build() throws IOException {
 		HSSFRow row = null;
 		int counter = 1;
 		int columCounter = 1;
-		String concatText = null;
-		ArrayList<List<String>> feature = new ArrayList<>();
+		String concatText = "";
+		ArrayList<List<String>> feature = new ArrayList<List<String>>();
 		
 		while(true){	
 			
@@ -233,9 +243,10 @@ public static void build() throws IOException {
 		//Write header to the file
 		FileWriter writer = new FileWriter("FeatureSet.csv");
 		StringTokenizer st = new StringTokenizer(finalUniqueFeature);
-		String dataValues = null;
+		String dataValues = "";
 		while(st.hasMoreElements()){
 			String featureString = st.nextToken();
+			featureString = featureString.replaceAll("'", "|");
 			if(!isNumeric(featureString)){
 				dataValues  = dataValues + " "+featureString;
 				writer.append(featureString);
