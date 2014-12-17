@@ -20,7 +20,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
-import com.yelpdata.ir.project.readExcel;
+import com.yelpdata.ir.project.CreateDataset;
 
 public class Utilities {
 
@@ -84,7 +84,7 @@ public class Utilities {
 	public static boolean checkDelCat(String cate){
 		
 		
-		for (String categories : readExcel.delCat){
+		for (String categories : CreateDataset.delCat){
 				
 			if(categories.equalsIgnoreCase(cate.trim()))
 				return true;
@@ -95,7 +95,7 @@ public class Utilities {
 	
 	public static boolean catInowPrecision(String catg){
 		
-		for (String categories : readExcel.lowPrecisionCategories){
+		for (String categories : CreateDataset.lowPrecisionCategories){
 			
 			if(categories.equalsIgnoreCase(catg.trim()))
 				return true;

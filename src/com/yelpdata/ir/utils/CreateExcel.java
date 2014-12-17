@@ -1,4 +1,4 @@
-package com.yelpdata.ir.project;
+package com.yelpdata.ir.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;

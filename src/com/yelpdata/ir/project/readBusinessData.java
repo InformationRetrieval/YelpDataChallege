@@ -1,5 +1,20 @@
 package com.yelpdata.ir.project;
 
+/*
+ * Authors : 
+ * 	1. Suraj Sonawane
+ * 	2. Aniket Bhosale
+ * 	3. Shivraj Nimbalkar
+ * 	4. Mayur Tare
+ * 
+ * Description : 
+ * 	This class implements a method to read yelp_academic_dataset_business.json and 
+ * 	extract business Id's having Restaurant as one of the category.
+ * 
+ * 
+ */
+
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -32,8 +47,6 @@ public class readBusinessData {
 				JSONObject p = (JSONObject) o;
 				int column = 0;
 				String business_id = p.get("business_id").toString();
-				//System.out.println("BusinessID = "+business_id );
-				//System.out.println("MapBID = +"+mapBidText.toString());
 				
 				if (mapBidText.containsKey(business_id) && p.get("categories").toString().contains("Restaurants")){
 					//System.out.println("In if");

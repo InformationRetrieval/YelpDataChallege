@@ -40,7 +40,7 @@ import org.json.simple.parser.JSONParser;
 import com.yelpdata.ir.utils.Utilities;
 
 
-public class readExcel {
+public class CreateDataset {
 	
 	//Global map containing category and coresponding reviews
 	
